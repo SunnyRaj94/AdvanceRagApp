@@ -33,29 +33,6 @@ if logs_collection is None:
         format='%(asctime)s - %(message)s'
     )
 
-# def query_rag_system(query: str, top_k: int = 5) -> str:
-#     """
-#     Query the RAG system to retrieve relevant context and return a response.
-#     """
-#     # Step 1: Get the embeddings of the query
-#     query_embedding = get_embeddings([query])[0]
-
-#     # Step 2: Retrieve relevant context from the vector store
-#     vectorstore = VectorStore(dim=len(query_embedding))
-#     relevant_chunks = vectorstore.search(query_embedding, top_k=top_k)
-
-#     # Step 3: Combine context and query, and send it to LLM
-#     context = "\n".join(relevant_chunks)
-#     full_prompt = f"Context:\n{context}\n\nQuestion: {query}"
-
-#     # Step 4: Get response from LLM
-#     response = get_response_from_llm(full_prompt)
-
-#     # Step 5: Log the interaction (either to MongoDB or a log file)
-#     log_interaction(query, relevant_chunks, response)
-
-#     return response
-
 def log_interaction(query: str, context: list[str], response: str):
     """
     Log the interaction into MongoDB or a log file based on the configuration.
@@ -87,26 +64,33 @@ from backend.llm_engine import get_response_from_llm
 from backend.rag.logger import log_query
 from config import settings
 
+from backend.rag.vector_store import VectorStore
+from backend.rag.embedder import get_embeddings, get_model
+import numpy as np
+
 def query_rag_system(query: str, top_k: int = 5) -> str:
-    """
-    Query the RAG system to retrieve relevant context and return a response.
-    """
     # Step 1: Get query embedding
     query_embedding = get_embeddings([query])[0]
 
-    # Step 2: Search vector store
-    vectorstore = VectorStore(settings["vector_store"]["path"])
-    relevant_chunks = vectorstore.search(query_embedding, top_k=top_k)
+    # Step 1.5: Infer dim from query_embedding
+    dim = len(query_embedding)
 
-    # Step 3: Build context and prompt
-    context_texts = [chunk["text"] for chunk in relevant_chunks]
-    context = "\n".join(context_texts)
+    # Step 2: Load vector store
+    vectorstore = VectorStore(dim)
+    vectorstore.load()
+
+    # Step 3: Search
+    relevant_chunks = vectorstore.search(np.array([query_embedding]), top_k=top_k)
+
+    # Step 4: Build context
+    context = "\n".join(relevant_chunks)
     full_prompt = f"Context:\n{context}\n\nQuestion: {query}"
 
-    # Step 4: Query LLM
+    # Step 5: Get response
     response = get_response_from_llm(full_prompt)
 
-    # Step 5: Log
+    # Step 6: Log
     log_query(query, context, response)
 
     return response
+

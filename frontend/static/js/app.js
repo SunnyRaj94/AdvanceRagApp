@@ -1,7 +1,7 @@
 // frontend/static/js/app.js
 
 async function getRagResponse(query) {
-    const response = await fetch("/query", {
+    const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

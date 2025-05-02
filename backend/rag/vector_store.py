@@ -35,11 +35,17 @@ class VectorStore:
         if os.path.exists(VECTOR_DB_PATH) and os.path.exists(META_PATH):
             self.index = faiss.read_index(VECTOR_DB_PATH)
             with open(META_PATH, "rb") as f:
-                self.text_chunks = pickle.load(f)
+                data = pickle.load(f)
+                if isinstance(data, dict):
+                    self.text_chunks = data.get("text_chunks", [])
+                else:
+                    self.text_chunks = data  # for backward compatibility
+
 
     def search(self, query_emb: np.ndarray, top_k: int = 5) -> List[str]:
         _, indices = self.index.search(query_emb, top_k)
-        return [self.text_chunks[i] for i in indices[0] if i < len(self.text_chunks)]
+        return [self.text_chunks[i] for i in indices[0] if i != -1 and i < len(self.text_chunks)]
+
     
 
 

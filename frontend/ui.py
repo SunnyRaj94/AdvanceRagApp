@@ -18,6 +18,10 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def get_current_user(request: Request):
     return request.session.get("user")
 
+@router.get("/test", response_class=HTMLResponse)
+async def test_page(request: Request):
+    return HTMLResponse(content="Test page works!")
+
 
 @router.get("/", response_class=HTMLResponse)
 async def root(request: Request):

@@ -1,64 +1,57 @@
-from fastapi import FastAPI, HTTPException, Request
-from starlette.middleware.sessions import SessionMiddleware
-from fastapi.staticfiles import StaticFiles
 import yaml
-import os
+from fastapi import FastAPI, HTTPException
 from backend.rag.query import query_rag_system
 from frontend.ui import router as ui_router
-
 from fastapi.templating import Jinja2Templates
-from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
-# Load config
+# Load settings
 with open("config/settings.yaml", "r") as f:
     settings = yaml.safe_load(f)
 
+from pydantic import BaseModel
+
+class QueryRequest(BaseModel):
+    query: str
+    top_k: int = 5
+
+
 app = FastAPI(title=settings["app"]["name"], debug=settings["app"]["debug"])
 
-from fastapi.middleware.cors import CORSMiddleware
-
+app.add_middleware(SessionMiddleware, secret_key="your-session-secret-key")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or ["http://localhost:8000"]
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Add session middleware (secret key should ideally come from env var)
-app.add_middleware(SessionMiddleware, secret_key="your-session-secret-key")
-
-# Mount static files (optional)
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
-
-# Include frontend routes
 app.include_router(ui_router)
 
-# Placeholder for backend routes to be added later
-# from backend.api import router as api_router
-# app.include_router(api_router, prefix="/api")
+print("Mounting UI routes...")
+print("Available routes:", ui_router.routes)
+
 # Serve templates
 templates = Jinja2Templates(directory="frontend/templates")
-
-# # Endpoint to serve HTML
-# @app.get("/")
-# async def get_home(request: Request):
-#     return templates.TemplateResponse("index.html", {"request": request})
-
-
-@app.post("/query")
-async def query(query: str, top_k: int = 5):
+@app.post("/api/chat")
+async def query(request: QueryRequest):
     try:
-        response = query_rag_system(query, top_k)
+        print(f"Received query: {request.query}, top_k: {request.top_k}")
+        response = query_rag_system(request.query, request.top_k)
+        print(f"Generated response: {response}")
         return {"response": response}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"RAG Error: {str(e)}")
 
 
 
-
-
-
+# Only needed for local script execution
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host=settings["app"]["host"], port=settings["app"]["port"], reload=True)
