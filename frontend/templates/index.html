@@ -1,0 +1,21 @@
+<!-- frontend/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Query</title>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>  <!-- Link to your JS file -->
+</head>
+<body>
+    <h1>Ask a Question</h1>
+    <form id="queryForm">
+        <label for="queryInput">Your Question:</label>
+        <input type="text" id="queryInput" name="query" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="responseOutput"></div>  <!-- Displaying the response here -->
+
+</body>
+</html>

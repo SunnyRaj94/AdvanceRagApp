@@ -1,0 +1,23 @@
+fastapi
+uvicorn[standard]
+jinja2
+pymongo
+pyyaml
+python-multipart
+itsdangerous
+# Optional: LLM-related packages (customize later based on your setup)
+# Example: for llama.cpp bindings, uncomment:
+llama-cpp-python
+
+faiss-cpu
+sentence-transformers
+python-docx
+PyMuPDF
+
+beautifulsoup4
+requests
+numpy
+
+PyPDF2
+docx2txt
+openai

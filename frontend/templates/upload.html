@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>Upload Document</title></head>
+<body>
+  <h2>Upload Document</h2>
+  <form action="/upload" enctype="multipart/form-data" method="post">
+    <input type="file" name="file" />
+    <button type="submit">Upload</button>
+  </form>
+  {% if msg %}
+    <p>{{ msg }}</p>
+  {% endif %}
+  <a href="/chat">Go to Chat</a>
+</body>
+</html>

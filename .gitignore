@@ -172,3 +172,43 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Ignore environment directories
+.venv/
+env/
+venv/
+*.env
+*.venv
+
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore model and data files (assuming models and data are stored locally)
+models/
+data/
+
+# Ignore log files
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore configuration files (if they contain sensitive information)
+config/settings.yaml
+
+# Ignore temporary files created by IDEs
+.idea/
+.vscode/
+
+# Ignore virtual environment dependencies if in requirements.txt
+*.lock
