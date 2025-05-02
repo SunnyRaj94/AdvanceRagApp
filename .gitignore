@@ -212,3 +212,7 @@ config/settings.yaml
 
 # Ignore virtual environment dependencies if in requirements.txt
 *.lock
+
+# Ignore FAISS and metadata files
+*.pkl
+*.faiss
