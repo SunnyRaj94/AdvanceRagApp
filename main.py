@@ -13,6 +13,7 @@ with open("config/settings.yaml", "r") as f:
 
 from pydantic import BaseModel
 
+
 class QueryRequest(BaseModel):
     query: str
     top_k: int = 5
@@ -37,6 +38,8 @@ print("Available routes:", ui_router.routes)
 
 # Serve templates
 templates = Jinja2Templates(directory="frontend/templates")
+
+
 @app.post("/api/chat")
 async def query(request: QueryRequest):
     try:
@@ -46,12 +49,18 @@ async def query(request: QueryRequest):
         return {"response": response}
     except Exception as e:
         import traceback
+
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"RAG Error: {str(e)}")
-
 
 
 # Only needed for local script execution
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host=settings["app"]["host"], port=settings["app"]["port"], reload=True)
+
+    uvicorn.run(
+        "main:app",
+        host=settings["app"]["host"],
+        port=settings["app"]["port"],
+        reload=True,
+    )

@@ -1,8 +1,6 @@
-from fastapi import APIRouter, Request, Form, UploadFile, File, Depends
+from fastapi import APIRouter, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from starlette.middleware.sessions import SessionMiddleware
-from starlette.responses import RedirectResponse
 import shutil
 import os
 
@@ -17,6 +15,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def get_current_user(request: Request):
     return request.session.get("user")
+
 
 @router.get("/test", response_class=HTMLResponse)
 async def test_page(request: Request):
@@ -52,7 +51,9 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
     file_path = os.path.join(UPLOAD_DIR, file.filename)
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    return templates.TemplateResponse("upload.html", {"request": request, "msg": f"Uploaded {file.filename}"})
+    return templates.TemplateResponse(
+        "upload.html", {"request": request, "msg": f"Uploaded {file.filename}"}
+    )
 
 
 @router.get("/chat", response_class=HTMLResponse)

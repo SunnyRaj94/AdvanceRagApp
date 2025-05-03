@@ -1,10 +1,14 @@
 import os
 import logging
+import datetime
+import numpy as np
 from backend.rag.vector_store import VectorStore
 from backend.rag.embedder import get_embeddings
-from config import settings
+from backend.llm_engine import get_response_from_llm
+from backend.rag.logger import log_query
 from pymongo import MongoClient
-import datetime
+from config import settings
+
 
 # Initialize MongoDB client (if available)
 client = None
@@ -25,13 +29,12 @@ max_log_size_mb = settings["app"].get("max_log_size_mb", 2)
 if logs_collection is None:
     if not os.path.exists(os.path.dirname(log_file_path)):
         os.makedirs(os.path.dirname(log_file_path))
-    
+
     # Configure file logging
     logging.basicConfig(
-        filename=log_file_path,
-        level=logging.INFO,
-        format='%(asctime)s - %(message)s'
+        filename=log_file_path, level=logging.INFO, format="%(asctime)s - %(message)s"
     )
+
 
 def log_interaction(query: str, context: list[str], response: str):
     """
@@ -41,9 +44,9 @@ def log_interaction(query: str, context: list[str], response: str):
         "query": query,
         "context": context,
         "response": response,
-        "timestamp": datetime.datetime.now()
+        "timestamp": datetime.datetime.now(),
     }
-    
+
     if logs_collection:
         # Log to MongoDB
         logs_collection.insert_one(log_entry)
@@ -53,20 +56,12 @@ def log_interaction(query: str, context: list[str], response: str):
         if file_size >= max_log_size_mb:
             # Rotate the log file (move to backup)
             os.rename(log_file_path, f"{log_file_path}.backup")
-            with open(log_file_path, 'w'):
+            with open(log_file_path, "w"):
                 pass  # Create a new empty log file
 
         # Log to the file
         logging.info(f"Query: {query}\nContext: {context}\nResponse: {response}")
 
-
-from backend.llm_engine import get_response_from_llm
-from backend.rag.logger import log_query
-from config import settings
-
-from backend.rag.vector_store import VectorStore
-from backend.rag.embedder import get_embeddings, get_model
-import numpy as np
 
 def query_rag_system(query: str, top_k: int = 5) -> str:
     # Step 1: Get query embedding
@@ -93,4 +88,3 @@ def query_rag_system(query: str, top_k: int = 5) -> str:
     log_query(query, context, response)
 
     return response
-

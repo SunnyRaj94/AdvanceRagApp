@@ -8,6 +8,7 @@ from typing import List
 VECTOR_DB_PATH = settings["rag"]["vector_store_path"] + "/index.faiss"
 META_PATH = settings["rag"]["vector_store_path"] + "/meta.pkl"
 
+
 class VectorStore:
     def __init__(self, dim: int):
         self.index = faiss.IndexFlatL2(dim)
@@ -17,9 +18,9 @@ class VectorStore:
         self.index.add(np.array(embeddings).astype("float32"))
         self.text_chunks.extend(chunks)
 
-    def search(self, query_embedding: list[float], top_k: int = 5) -> list[str]:
-        D, I = self.index.search(np.array([query_embedding]).astype("float32"), top_k)
-        return [self.text_chunks[i] for i in I[0] if i < len(self.text_chunks)]
+    # def search(self, query_embedding: list[float], top_k: int = 5) -> list[str]:
+    #     D, I = self.index.search(np.array([query_embedding]).astype("float32"), top_k)
+    #     return [self.text_chunks[i] for i in I[0] if i < len(self.text_chunks)]
 
     def add_embeddings(self, embeddings: np.ndarray, texts: List[str]):
         self.index.add(embeddings)
@@ -41,11 +42,10 @@ class VectorStore:
                 else:
                     self.text_chunks = data  # for backward compatibility
 
-
     def search(self, query_emb: np.ndarray, top_k: int = 5) -> List[str]:
         _, indices = self.index.search(query_emb, top_k)
-        return [self.text_chunks[i] for i in indices[0] if i != -1 and i < len(self.text_chunks)]
-
-    
-
-
+        return [
+            self.text_chunks[i]
+            for i in indices[0]
+            if i != -1 and i < len(self.text_chunks)
+        ]

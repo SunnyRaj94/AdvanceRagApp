@@ -21,3 +21,7 @@ numpy
 PyPDF2
 docx2txt
 openai
+
+# code formatting
+black
+flake8

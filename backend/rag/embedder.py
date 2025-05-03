@@ -5,6 +5,7 @@ import os
 
 model = None
 
+
 def get_model():
     global model
     if model is not None:
@@ -33,6 +34,8 @@ def get_embeddings(texts: list[str]) -> list[list[float]]:
         return model.encode(texts, convert_to_numpy=True).tolist()
     elif embedder_type == "openai":
         return [
-            openai.Embedding.create(input=t, model=settings["embedding"]["model_name"])["data"][0]["embedding"]
+            openai.Embedding.create(input=t, model=settings["embedding"]["model_name"])[
+                "data"
+            ][0]["embedding"]
             for t in texts
         ]

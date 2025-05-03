@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import JSONResponse
-from config import settings
+
+# from config import settings
 from backend.llm_engine import get_response_from_llm
 from backend.storage import log_chat
 
 router = APIRouter()
+
 
 @router.post("/chat")
 async def chat(query: str = Form(...), request: Request = None):

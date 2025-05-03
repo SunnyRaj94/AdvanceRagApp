@@ -1,13 +1,11 @@
-# backend/rag/logger.py
-
 import os
 import json
-import logging
 from config import settings
 from datetime import datetime
 
 try:
     from backend.db.mongo import get_logs_collection
+
     logs_collection = get_logs_collection()
 except Exception:
     logs_collection = None
@@ -18,7 +16,6 @@ LOG_FILE_PATH = settings["app"].get("log_file_path", "./logs/rag_queries.log")
 MAX_LOG_FILE_SIZE_MB = settings["app"].get("max_log_size_mb", 2)
 
 
-
 def log_query(query: str, context: str, response: str) -> None:
     """
     Log the query, context, and response to MongoDB or fallback to file.
@@ -27,7 +24,7 @@ def log_query(query: str, context: str, response: str) -> None:
         "timestamp": datetime.utcnow().isoformat(),
         "query": query,
         "context": context,
-        "response": response
+        "response": response,
     }
 
     if logs_collection is not None:
@@ -47,7 +44,12 @@ def _log_to_file(entry: dict) -> None:
     if os.path.exists(LOG_FILE_PATH):
         size_mb = os.path.getsize(LOG_FILE_PATH) / (1024 * 1024)
         if size_mb > MAX_LOG_FILE_SIZE_MB:
-            os.rename(LOG_FILE_PATH, LOG_FILE_PATH.replace(".json", f"_{int(datetime.utcnow().timestamp())}.bak"))
+            os.rename(
+                LOG_FILE_PATH,
+                LOG_FILE_PATH.replace(
+                    ".json", f"_{int(datetime.utcnow().timestamp())}.bak"
+                ),
+            )
 
     # Append entry
     with open(LOG_FILE_PATH, "a") as f:

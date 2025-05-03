@@ -1,9 +1,9 @@
-# backend/rag/ingest.py
 from backend.rag.processor import extract_text, chunk_text
 from backend.rag.embedder import get_embeddings
 from backend.rag.vector_store import VectorStore
-from config import settings
-import numpy as np
+
+# from config import settings
+# import numpy as np
 
 
 def ingest_document(file_path: str):

@@ -4,11 +4,18 @@ from config import settings
 model_type = settings["llm"]["model_type"]
 
 # Load keys from config or environment
-openai_api_key = settings["llm"].get("openai", {}).get("api_key", os.getenv("OPENAI_API_KEY"))
-hf_api_key = settings["llm"].get("huggingface", {}).get("api_key", os.getenv("HUGGINGFACE_API_KEY"))
+openai_api_key = (
+    settings["llm"].get("openai", {}).get("api_key", os.getenv("OPENAI_API_KEY"))
+)
+hf_api_key = (
+    settings["llm"]
+    .get("huggingface", {})
+    .get("api_key", os.getenv("HUGGINGFACE_API_KEY"))
+)
 
 # Optional: cache model instance
 llama_model = None
+
 
 def get_response_from_llm(prompt: str, context: str = "") -> str:
     full_prompt = f"{context}\n\n{prompt}" if context else prompt
@@ -36,26 +43,30 @@ def run_llama_cpp(prompt: str) -> str:
         )
     max_tokens = settings["llm"].get("max_tokens", 512)
 
-
     response = llama_model(
         prompt,
         temperature=settings["llm"]["temperature"],
         max_tokens=max_tokens,  # adjust as needed
-        stop=[],         # let it run freely
+        stop=[],  # let it run freely
     )
 
-    return response["choices"][0]["text"].strip() if "choices" in response else "No response"
+    return (
+        response["choices"][0]["text"].strip()
+        if "choices" in response
+        else "No response"
+    )
 
 
 def run_openai(prompt: str) -> str:
     import openai
+
     openai.api_key = openai_api_key
     model = settings["llm"]["openai"]["model"]
 
     response = openai.ChatCompletion.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
-        temperature=settings["llm"]["temperature"]
+        temperature=settings["llm"]["temperature"],
     )
     return response.choices[0].message.content.strip()
 
@@ -64,19 +75,15 @@ def run_huggingface(prompt: str) -> str:
     import requests
 
     model = settings["llm"]["huggingface"]["model"]
-    headers = {
-        "Authorization": f"Bearer {hf_api_key}"
-    }
+    headers = {"Authorization": f"Bearer {hf_api_key}"}
     payload = {
         "inputs": prompt,
-        "parameters": {
-            "temperature": settings["llm"]["temperature"]
-        }
+        "parameters": {"temperature": settings["llm"]["temperature"]},
     }
     response = requests.post(
         f"https://api-inference.huggingface.co/models/{model}",
         headers=headers,
-        json=payload
+        json=payload,
     )
     data = response.json()
     return data[0]["generated_text"].strip() if isinstance(data, list) else str(data)
