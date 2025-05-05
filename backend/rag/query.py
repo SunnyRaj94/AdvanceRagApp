@@ -63,19 +63,20 @@ def log_interaction(query: str, context: list[str], response: str):
         logging.info(f"Query: {query}\nContext: {context}\nResponse: {response}")
 
 
-def query_rag_system(query: str, top_k: int = 5) -> str:
+def query_rag_system(query: str, top_k: int = 5, source: str = "all") -> str:
     # Step 1: Get query embedding
     query_embedding = get_embeddings([query])[0]
 
-    # Step 1.5: Infer dim from query_embedding
+    # Step 1.5: Infer dim from query_eokmbedding
     dim = len(query_embedding)
 
     # Step 2: Load vector store
     vectorstore = VectorStore(dim)
     vectorstore.load()
 
-    # Step 3: Search
-    relevant_chunks = vectorstore.search(np.array([query_embedding]), top_k=top_k)
+    relevant_chunks = vectorstore.search(
+        np.array([query_embedding]), top_k=top_k, filter_by=source
+    )
 
     # Step 4: Build context
     context = "\n".join(relevant_chunks)

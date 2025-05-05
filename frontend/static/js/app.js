@@ -1,22 +1,25 @@
-// frontend/static/js/app.js
+document.getElementById("chat-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-async function getRagResponse(query) {
-  const response = await fetch("/api/chat", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query, top_k: 5 }),
-  });
-  const data = await response.json();
-  return data.response;
-}
+  const query = document.getElementById("query").value;
+  const source = document.getElementById("source_type").value;
 
-document
-  .getElementById("queryForm")
-  .addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const query = document.getElementById("queryInput").value;
-    const response = await getRagResponse(query);
-    document.getElementById("responseOutput").innerText = response;
-  });
+  try {
+    const response = await fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: query,
+        source: source,
+        top_k: 5,
+      }),
+    });
+
+    const data = await response.json();
+    document.getElementById("chat-response").innerText = data.response || data.error;
+  } catch (error) {
+    document.getElementById("chat-response").innerText = "Error: " + error.message;
+  }
+});

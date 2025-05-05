@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Chat</title>
-  </head>
+<head>
+  <title>Chat Interface</title>
+  <script src="/static/js/app.js" defer></script>
+</head>
+<body>
+  <h1>Chat with RAG</h1>
+  <form id="chat-form">
+    <label for="query">Enter your query:</label><br>
+    <input type="text" id="query" name="query" required><br><br>
 
-  <body>
-    <h2>Chat with RAG</h2>
-    <form id="queryForm">
-      <input
-        type="text"
-        id="queryInput"
-        name="query"
-        placeholder="Ask a question..."
-      />
-      <button type="submit">Send</button>
-    </form>
-    <div id="responseOutput"></div>
+    <label for="source_type">Source:</label>
+    <select id="source_type" name="source_type">
+      <option value="all">All</option>
+      <option value="file">File</option>
+      <option value="url">URL</option>
+    </select><br><br>
 
-    <!-- Add your JS at the end -->
-    <script src="/static/js/app.js"></script>
-  </body>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Response:</h2>
+  <pre id="chat-response"></pre>
+</body>
 </html>
