@@ -18,7 +18,11 @@ llama_model = None
 
 
 def get_response_from_llm(prompt: str, context: str = "") -> str:
-    full_prompt = f"{context}\n\n{prompt}" if context else prompt
+    full_prompt = (
+        f"Answer the question based on the following content.\n\n"
+        f"Content:\n{context}\n\n"
+        f"Question: {prompt}\nAnswer:"
+    )
 
     if model_type == "llama-cpp":
         return run_llama_cpp(full_prompt)
@@ -49,6 +53,8 @@ def run_llama_cpp(prompt: str) -> str:
         max_tokens=max_tokens,  # adjust as needed
         stop=[],  # let it run freely
     )
+
+    print("Raw LLaMA response:", response)
 
     return (
         response["choices"][0]["text"].strip()

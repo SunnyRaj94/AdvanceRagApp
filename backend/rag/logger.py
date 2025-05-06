@@ -2,6 +2,8 @@ import os
 import json
 from config import settings
 from datetime import datetime
+from collections import OrderedDict
+from typing import Dict
 
 try:
     from backend.db.mongo import get_logs_collection
@@ -54,3 +56,51 @@ def _log_to_file(entry: dict) -> None:
     # Append entry
     with open(LOG_FILE_PATH, "a") as f:
         f.write(json.dumps(entry) + "\n")
+
+
+class MetadataStore:
+    def __init__(self, filepath: str, max_size_mb: float = 2.0):
+        self.filepath = filepath
+        self.max_bytes = int(max_size_mb * 1024 * 1024)
+        self._load()
+
+    def _load(self):
+        print("trying to make metadatastore")
+        if os.path.exists(self.filepath):
+            try:
+                with open(self.filepath, "r") as f:
+                    self.store = OrderedDict(json.load(f))
+                print("metadatastore made")
+            except json.JSONDecodeError:
+                print("error in making metadatastore")
+                self.store = OrderedDict()
+        else:
+            self.store = OrderedDict()
+
+    def _save(self):
+        # Enforce max size by removing oldest entries
+        while True:
+            json_str = json.dumps(self.store, indent=2)
+            if len(json_str.encode("utf-8")) <= self.max_bytes:
+                break
+            if self.store:
+                self.store.popitem(last=False)  # Remove the oldest item
+            else:
+                break
+
+        with open(self.filepath, "w") as f:
+            json.dump(self.store, f, indent=2)
+
+    def add(self, item_id: str, data: Dict):
+        data["timestamp"] = datetime.utcnow().isoformat()
+        self.store[item_id] = data
+        self._save()
+
+    def list(self) -> Dict:
+        return dict(self.store)
+
+    def delete(self, source_type: str, context_id: str):
+        self.store = OrderedDict(
+            (k, v) for k, v in self.store.items() if k != context_id
+        )
+        self._save()

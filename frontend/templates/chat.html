@@ -1,26 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>Chat Interface</title>
+  <meta charset="UTF-8" />
+  <title>Chat with RAG</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
   <script src="/static/js/app.js" defer></script>
 </head>
+
 <body>
-  <h1>Chat with RAG</h1>
-  <form id="chat-form">
-    <label for="query">Enter your query:</label><br>
-    <input type="text" id="query" name="query" required><br><br>
+  <div id="sidebar" class="sidebar">
+    <h3>Files</h3>
+    <ul id="file-list"></ul>
 
-    <label for="source_type">Source:</label>
-    <select id="source_type" name="source_type">
-      <option value="all">All</option>
+    <h3>Links</h3>
+    <ul id="link-list"></ul>
+
+    <select id="source-type" onchange="toggleInputFields()">
       <option value="file">File</option>
-      <option value="url">URL</option>
-    </select><br><br>
+      <option value="link">Link</option>
+    </select>
 
-    <button type="submit">Submit</button>
-  </form>
+    <!-- File input -->
+    <div id="file-input-group">
+      <input type="file" id="file-input" />
+    </div>
 
-  <h2>Response:</h2>
-  <pre id="chat-response"></pre>
+    <!-- Link input -->
+    <div id="link-input-group" style="display: none">
+      <input type="text" id="link-input" placeholder="Enter link" />
+    </div>
+
+    <button onclick="ingestSource()">Ingest</button>
+    <button onclick="refreshContext()">Refresh</button>
+  </div>
+
+
+  <div id="main-content">
+    <h1>Chat with RAG</h1>
+    <form id="chat-form">
+      <label for="query">Enter your query:</label><br />
+      <input type="text" id="query" name="query" required /><br /><br />
+
+      <label for="source_type">Source:</label>
+      <select id="source_type" name="source_type">
+        <option value="all">All</option>
+        <option value="file">File</option>
+        <option value="url">URL</option>
+      </select><br /><br />
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <h2>Response:</h2>
+    <pre id="chat-response"></pre>
+  </div>
 </body>
+
 </html>

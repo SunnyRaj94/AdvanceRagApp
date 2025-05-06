@@ -1,0 +1,16 @@
+{
+  "efca8673-c7d5-4e20-848b-d53fb3b576f5": {
+    "source": "https://medium.com/@mail-sunnyraj94/web-scraping-guide-78b26c0d8bca",
+    "type": "url",
+    "user": "anonymous",
+    "chunks": 48,
+    "timestamp": "2025-05-06T07:21:38.061744"
+  },
+  "ebf3a0c7-0e93-4948-9b0f-661f238fc9da": {
+    "source": "./data/uploaded_docs/IPCC_AR6_WGII_Chapter03.pdf",
+    "type": "file",
+    "user": "anonymous",
+    "chunks": 2376,
+    "timestamp": "2025-05-06T09:02:44.255657"
+  }
+}

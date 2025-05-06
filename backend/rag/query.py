@@ -63,29 +63,61 @@ def log_interaction(query: str, context: list[str], response: str):
         logging.info(f"Query: {query}\nContext: {context}\nResponse: {response}")
 
 
-def query_rag_system(query: str, top_k: int = 5, source: str = "all") -> str:
+def query_rag_system(
+    query: str,
+    top_k: int = 5,
+    source: str = "all",
+    file_id: str = None,
+    link_id: str = None,
+) -> str:
+    """
+    Run a RAG pipeline using the given query, filtering by source type or context ID (file or URL).
+
+    Args:
+        query (str): User's question.
+        top_k (int): Number of chunks to retrieve.
+        source (str): Source type - "all", "file", "url".
+        file_id (str, optional): Optional specific file ID to restrict the context.
+        link_id (str, optional): Optional specific link ID to restrict the context.
+
+    Returns:
+        str: LLM-generated answer.
+    """
     # Step 1: Get query embedding
     query_embedding = get_embeddings([query])[0]
-
-    # Step 1.5: Infer dim from query_eokmbedding
     dim = len(query_embedding)
 
     # Step 2: Load vector store
     vectorstore = VectorStore(dim)
     vectorstore.load()
 
-    relevant_chunks = vectorstore.search(
-        np.array([query_embedding]), top_k=top_k, filter_by=source
+    # Step 3: Apply filters based on source type and context ID (file_id, link_id)
+    filter_by = source
+    context_id = (
+        file_id
+        if source == "file" and file_id
+        else link_id if source == "url" and link_id else None
     )
+    print("-----------------------")
+    print(f"context_id -- {context_id}")
 
-    # Step 4: Build context
+    # Step 4: Search for relevant chunks with context filtering
+    relevant_chunks = vectorstore.search(
+        np.array([query_embedding]),
+        top_k=top_k,
+        filter_by=filter_by,
+        context_id=context_id,
+    )
+    print("length of relevant_chunks -- ", {len(relevant_chunks)})
+    print("-----------------------")
+
+    # Step 5: Build prompt with context
     context = "\n".join(relevant_chunks)
-    full_prompt = f"Context:\n{context}\n\nQuestion: {query}"
 
-    # Step 5: Get response
-    response = get_response_from_llm(full_prompt)
+    # Step 6: Get LLM response
+    response = get_response_from_llm(prompt=query, context=context)
 
-    # Step 6: Log
+    # Step 7: Log the query, context, and response
     log_query(query, context, response)
 
     return response

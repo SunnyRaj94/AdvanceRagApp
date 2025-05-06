@@ -1,7 +1,7 @@
 import yaml
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,7 +14,6 @@ with open("config/settings.yaml", "r") as f:
 
 app = FastAPI(title=settings["app"]["name"], debug=settings["app"]["debug"])
 
-# Middleware
 app.add_middleware(SessionMiddleware, secret_key="your-session-secret-key")
 app.add_middleware(
     CORSMiddleware,
@@ -24,19 +23,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static assets and templates
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
-templates = Jinja2Templates(directory="frontend/templates")
-
-# Include routers
 app.include_router(ui_router)
 app.include_router(api_router)
 
-print("Mounting UI and API routes...")
-print("UI Routes:", ui_router.routes)
-print("API Routes:", api_router.routes)
+print("Mounting UI routes...")
+print("Available routes:", ui_router.routes)
 
-# For standalone execution
+# Serve templates
+templates = Jinja2Templates(directory="frontend/templates")
+
+# Only needed for local script execution
 if __name__ == "__main__":
     import uvicorn
 
@@ -45,4 +42,5 @@ if __name__ == "__main__":
         host=settings["app"]["host"],
         port=settings["app"]["port"],
         reload=True,
+        debug=True,
     )
