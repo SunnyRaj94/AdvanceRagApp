@@ -1,4 +1,4 @@
-# 🧠 Local RAG App
+# 🧠 docudialogue -> Local RAG App with context (docs/links etc)
 
 A powerful **Retrieval-Augmented Generation (RAG)** application with:
 
