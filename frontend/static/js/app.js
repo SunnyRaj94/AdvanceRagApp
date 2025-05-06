@@ -15,6 +15,7 @@ document.getElementById("chat-form").addEventListener("submit", async function (
     link_id: contextType === "link" ? selectedContext?.id : null,
   };
 
+  showLoading();
   try {
     const response = await fetch("/chat", {
       method: "POST",
@@ -37,6 +38,8 @@ document.getElementById("chat-form").addEventListener("submit", async function (
   } catch (error) {
     console.error("Chat error:", error);
     document.getElementById("chat-response").innerText = "Error: " + error.message;
+  } finally {
+    hideLoading();
   }
 });
 
@@ -88,6 +91,7 @@ async function deleteContext(type, id) {
 
   const endpoint = type === "file" ? `/delete/file/${id}` : `/delete/link/${id}`;
 
+  showLoading();
   try {
     const res = await fetch(endpoint, { method: "DELETE" });
     const data = await res.json();
@@ -100,9 +104,10 @@ async function deleteContext(type, id) {
   } catch (err) {
     console.error("Delete error:", err);
     alert("Error deleting item: " + err.message);
+  } finally {
+    hideLoading();
   }
 }
-
 
 async function ingestSource() {
   const type = document.getElementById("source-type").value;
@@ -127,6 +132,7 @@ async function ingestSource() {
     endpoint = "/ingest/link";
   }
 
+  showLoading();
   try {
     const res = await fetch(endpoint, {
       method: "POST",
@@ -152,6 +158,8 @@ async function ingestSource() {
     }
   } catch (err) {
     alert("Error ingesting: " + err.message);
+  } finally {
+    hideLoading();
   }
 }
 
@@ -170,3 +178,11 @@ window.addEventListener("DOMContentLoaded", () => {
   toggleInputFields();
   refreshContext();
 });
+
+function showLoading() {
+  document.getElementById("loading-spinner").style.display = "flex";
+}
+
+function hideLoading() {
+  document.getElementById("loading-spinner").style.display = "none";
+}

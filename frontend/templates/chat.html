@@ -9,52 +9,67 @@
 </head>
 
 <body>
-  <div id="sidebar" class="sidebar">
-    <h3>Files</h3>
-    <ul id="file-list"></ul>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Sources</h2>
 
-    <h3>Links</h3>
-    <ul id="link-list"></ul>
+      <div class="context-group">
+        <h3>Files</h3>
+        <ul id="file-list" class="context-list"></ul>
+      </div>
 
-    <select id="source-type" onchange="toggleInputFields()">
-      <option value="file">File</option>
-      <option value="link">Link</option>
-    </select>
+      <div class="context-group">
+        <h3>Links</h3>
+        <ul id="link-list" class="context-list"></ul>
+      </div>
 
-    <!-- File input -->
-    <div id="file-input-group">
-      <input type="file" id="file-input" />
-    </div>
+      <div class="ingest-controls">
+        <select id="source-type" onchange="toggleInputFields()" class="styled-select">
+          <option value="file">File</option>
+          <option value="link">Link</option>
+        </select>
 
-    <!-- Link input -->
-    <div id="link-input-group" style="display: none">
-      <input type="text" id="link-input" placeholder="Enter link" />
-    </div>
+        <div id="file-input-group">
+          <input type="file" id="file-input" class="styled-input" />
+        </div>
 
-    <button onclick="ingestSource()">Ingest</button>
-    <button onclick="refreshContext()">Refresh</button>
+        <div id="link-input-group" style="display: none">
+          <input type="text" id="link-input" placeholder="Enter link" class="styled-input" />
+        </div>
+
+        <button onclick="ingestSource()" class="btn btn-ingest">Ingest</button>
+        <button onclick="refreshContext()" class="btn btn-secondary">Refresh</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <h1>Chat with RAG</h1>
+
+      <form id="chat-form" class="chat-form">
+        <input type="text" id="query" name="query" placeholder="Enter your query..." class="styled-input" required />
+
+        <div class="source-select-row">
+          <label for="source_type">Source:</label>
+          <select id="source_type" name="source_type" class="styled-select">
+            <option value="all">All</option>
+            <option value="file">File</option>
+            <option value="url">URL</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+
+      <div class="response-section">
+        <h2>Response</h2>
+        <pre id="chat-response" class="chat-response"></pre>
+      </div>
+    </main>
+  </div>
+  <div id="loading-spinner" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
   </div>
 
-
-  <div id="main-content">
-    <h1>Chat with RAG</h1>
-    <form id="chat-form">
-      <label for="query">Enter your query:</label><br />
-      <input type="text" id="query" name="query" required /><br /><br />
-
-      <label for="source_type">Source:</label>
-      <select id="source_type" name="source_type">
-        <option value="all">All</option>
-        <option value="file">File</option>
-        <option value="url">URL</option>
-      </select><br /><br />
-
-      <button type="submit">Submit</button>
-    </form>
-
-    <h2>Response:</h2>
-    <pre id="chat-response"></pre>
-  </div>
 </body>
 
 </html>

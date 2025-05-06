@@ -102,7 +102,7 @@ async def list_ingested_files():
     """
     items = file_metadata_store.list()
     links = [
-        {"id": k, "source": v.get("source"), "filename": k}
+        {"id": k, "source": v.get("source"), "filename": v.get("source").split("/")[-1]}
         for k, v in items.items()
         if v.get("type") == "file"
     ]
